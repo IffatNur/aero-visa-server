@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 const port = process.env.PORT || 5000;
 require('dotenv').config();
-const jwt = require('jsonwebtoken');
 
 
 app.use(cors());
@@ -18,10 +18,32 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+function verifyJWT(req, res, next){
+    const authHeader = req.headers.authorization;
+    if(!authHeader){
+        return res.status(401).send({message: 'Unauthorized access'});
+    }
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function(error, decoded){
+        if(error){
+            return res.status(401).send({message: 'unauthorized access'});
+        }
+        req.decoded = decoded;
+        next();
+    });
+}
+
 async function run(){
     try{
         const serviceCollection = client.db('aerovisa').collection('services');
         const reviewCollection = client.db('aerovisa').collection('reviews');
+
+        app.post('/jwt', async(req,res) =>{
+            const user = req.body;
+            console.log(user);
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'});
+            res.send({token});
+        })
 
         app.get('/services', async(req,res)=>{
             const query = {};
@@ -52,12 +74,15 @@ async function run(){
         })
 
         // for slider
-        app.get('/reviews', async(req,res)=>{
+        app.get('/reviews',verifyJWT, async(req,res)=>{
+            const decoded = req.decoded;
             const query = req.query;
+            if(decoded.email !== query.email){
+                res.status(403).send({message: "Unauthorized access"})
+            }
             const cursor = reviewCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
-            console.log(result);
         })
 
 
