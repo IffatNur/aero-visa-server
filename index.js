@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ypkrnke.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -30,19 +30,19 @@ async function run(){
             res.send(result);
         })
 
-        app.get('/3services', async(req,res)=>{
+        app.get("/services/:id", async(req,res) =>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await serviceCollection.findOne(query);
+            res.send(result);
+        });
+
+        app.get('/threeservices', async(req,res)=>{
             const query = {};
             const cursor = serviceCollection.find(query);
             const result = await cursor.limit(3).toArray();
             res.send(result);
         })
-
-        // app.get('/reviews', async(req,res)=>{
-        //     const query = {};
-        //     const cursor = reviewCollection.find(query);
-        //     const result = await cursor.toArray();
-        //     res.send(result);
-        // })
 
         app.get('/reviews', async(req,res)=>{
             const query = req.query;
