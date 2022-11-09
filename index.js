@@ -29,7 +29,8 @@ async function run(){
             const result = await cursor.toArray();
             res.send(result);
         })
-
+        
+        //  to add new services 
         app.post("/services", async(req,res) =>{
             const query = req.body;
             const result = await serviceCollection.insertOne(query);
