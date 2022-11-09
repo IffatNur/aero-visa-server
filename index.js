@@ -44,12 +44,29 @@ async function run(){
             res.send(result);
         })
 
+        // for slider
         app.get('/reviews', async(req,res)=>{
             const query = req.query;
             const cursor = reviewCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
             console.log(result);
+        })
+
+        // to post a new review 
+        app.post('/reviews', async(req,res) =>{
+            const query = req.body;
+            const result = await reviewCollection.insertOne(query);
+            res.send(result);
+        })
+
+        // delete review 
+        app.delete('/reviews/:id', async(req,res) =>{
+            const id = req.params.id;
+            console.log(id);
+            const query = {_id: ObjectId(id)};
+            const result = await reviewCollection.deleteOne(query);
+            res.send(result);
         })
 
     }
