@@ -30,6 +30,12 @@ async function run(){
             res.send(result);
         })
 
+        app.post("/services", async(req,res) =>{
+            const query = req.body;
+            const result = await serviceCollection.insertOne(query);
+            res.send(result);
+        });
+
         app.get("/services/:id", async(req,res) =>{
             const id = req.params.id;
             const query = {_id: ObjectId(id)};
@@ -52,6 +58,7 @@ async function run(){
             res.send(result);
             console.log(result);
         })
+
 
         // to post a new review 
         app.post('/reviews', async(req,res) =>{
