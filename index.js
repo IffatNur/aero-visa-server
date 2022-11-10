@@ -92,6 +92,8 @@ async function run(){
       // to post a new review
       app.post("/reviews", async (req, res) => {
         const query = req.body;
+        // const date = req.body.date;
+        // console.log(date);
         const result = await reviewCollection.insertOne(query);
         res.send(result);
       });
