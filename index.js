@@ -79,9 +79,11 @@ async function run(){
       app.get("/reviews", verifyJWT, async (req, res) => {
         // const decoded = req.decoded;
         const query = req.query;
-        // if (decoded.email === query?.email) {
-        //     res.status(403).send({ message: "Unauthorized access" });
-        //   }
+        // if(query != {}){
+        //     if (decoded?.email === query?.email) {
+        //         res.status(403).send({ message: "Unauthorized access" });
+        //       }
+        // }
         const cursor = reviewCollection.find(query);
         const result = await cursor.toArray();
         res.send(result);
